@@ -1,0 +1,776 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechHire</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for the main content area */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Styles for the circular progress bar (Jobs Summary) */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        /* Hide sections by default */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Login to Tech Hire</h2>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
+                <input type="text" id="username" name="username" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500" placeholder="Enter your username">
+            </div>
+            <div>
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+                <input type="password" id="password" name="password" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-blue-500" placeholder="Enter your password">
+            </div>
+            <div id="login-error" class="text-red-500 text-sm hidden">Invalid username or password.</div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out transform hover:scale-105">
+                Login
+            </button>
+        </form>
+        <p class="text-center text-gray-500 text-xs mt-6">
+            <span class="font-semibold">Test Accounts:</span><br>
+            Recruiter: user: <span class="font-mono">recruiter</span>, pass: <span class="font-mono">pass</span><br>
+            Technical: user: <span class="font-mono">technical</span>, pass: <span class="font-mono">pass</span><br>
+            Admin: user: <span class="font-mono">admin</span>, pass: <span class="font-mono">pass</span>
+        </p>
+    </div>
+
+    <!-- Main Dashboard Container (initially hidden) -->
+    <div id="dashboard-container" class="hidden flex flex-1 min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col rounded-r-lg shadow-lg">
+            <div class="p-6 flex items-center justify-between border-b border-gray-800">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-orange-500 mr-2">Tech</span>
+                    <span class="text-xl font-semibold">Hire</span>
+                </div>
+                <button class="text-gray-400 hover:text-white focus:outline-none md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            <nav class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg bg-gray-800 text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path><path d="M15 7v2a4 4 0 01-4 4H9.071l-.492.492A2 2 0 018 16.172v-4.062a2 2 0 012-2h2.929A2 2 0 0015 9V7z"></path></svg>
+                            Inbox
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                            Calendar & Todos
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="mt-8 mb-2 text-xs font-semibold text-gray-500 uppercase">Recruitment</div>
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.586l-2.707 2.707A3 3 0 0115 16.586V18a2 2 0 01-2 2H7a2 2 0 01-2-2v-1.414a3 3 0 01-.879-2.121L2 11.586V8a2 2 0 012-2h2zm2 0h4V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm0 5a1 1 0 000 2h4a1 1 0 100-2H8z" clip-rule="evenodd"></path></svg>
+                            Jobs
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                            Candidates
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                            My Referrals
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12 1.586l-4 4v10.828l4-4V1.586zM9.071 5.929L3.757 11.243A2 2 0 004.172 14H15.828a2 2 0 00.415-2.757L10.929 5.929a2 2 0 00-1.858 0z" clip-rule="evenodd"></path></svg>
+                            Career Site
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="mt-8 mb-2 text-xs font-semibold text-gray-500 uppercase">Organization</div>
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                            Employee
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4a2 2 0 012 2v2h4a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h4V4H6z" clip-rule="evenodd"></path></svg>
+                            Structure
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"></path></svg>
+                            Report
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="flex items-center p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.3-.83-2.913.6-2.685 2.153a1.532 1.532 0 01-.582 2.286c-1.56.38-1.56 2.6 0 2.98a1.532 1.532 0 01.582 2.286c-.218 1.553 1.4 2.383 2.685 2.153a1.532 1.532 0 012.286.948c.38 1.56 2.6 1.56 2.98 0a1.532 1.532 0 012.286-.948c1.3.83 2.913-.6 2.685-2.153a1.532 1.532 0 01.582-2.286c1.56-.38 1.56-2.6 0-2.98a1.532 1.532 0 01-.582-2.286c.218-1.553-1.4-2.383-2.685-2.153a1.532 1.532 0 01-2.286-.948zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                            Setting
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t border-gray-800">
+                <button class="flex items-center w-full p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.732-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>
+                    Need Help?
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col bg-gray-100 rounded-l-lg overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white p-4 flex items-center justify-between shadow-md rounded-tl-lg">
+                <div class="flex items-center w-1/3">
+                    <button class="text-gray-500 hover:text-gray-700 mr-4 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div class="relative w-full">
+                        <input type="text" placeholder="Search" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Role Selection Dropdown -->
+                    <div class="relative inline-block text-left">
+                        <select id="role-dropdown" class="block appearance-none bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded-lg shadow leading-tight focus:outline-none focus:shadow-outline text-gray-700 text-sm">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                    <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md text-sm transition duration-300 ease-in-out">
+                        Logout
+                    </button>
+
+                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h1M3 12H2m8.003-9.127a9.003 9.003 0 017.07 7.07M10.929 18.929a9.003 9.003 0 01-7.07-7.07m14.142 0a9.003 9.003 0 01-7.07 7.07m-4.243-4.243a9.003 9.003 0 017.07-7.07"></path></svg>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://placehold.co/40x40/FF6347/FFFFFF?text=JD" alt="User Avatar" class="w-10 h-10 rounded-full object-cover">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Container -->
+            <div class="flex-1 p-6 overflow-y-auto custom-scrollbar">
+
+                <!-- Recruiter Dashboard (Default View) -->
+                <section id="recruiter-dashboard-content" class="hidden">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Recruiter Dashboard</h1>
+                    <p class="text-gray-500 mb-6">Today is Monday, 8th November 2025</p>
+
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="relative">
+                            <input type="text" value="Feb 18 - Nov 18" class="pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700">
+                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <div class="relative">
+                            <select class="block appearance-none w-full bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded-lg shadow leading-tight focus:outline-none focus:shadow-outline text-gray-700">
+                                <option>Monthly</option>
+                                <option>Weekly</option>
+                                <option>Daily</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+                        <button class="flex items-center bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Filter
+                        </button>
+                        <button class="flex items-center bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Export
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Hiring Section -->
+                        <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-semibold text-gray-800">Hiring</h3>
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative">
+                                        <select class="block appearance-none bg-white border border-gray-300 px-3 py-1 rounded-lg text-sm text-gray-700">
+                                            <option>Design</option>
+                                            <option>Engineering</option>
+                                            <option>Marketing</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                        </div>
+                                    </div>
+                                    <button class="text-blue-600 font-medium text-sm">VIEW ALL ></button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jobs</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New Applied</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screening</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interview</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hired</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                Design Head
+                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">18 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">8 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">3 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                Art Lead
+                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">16 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">10 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">30 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                PRODUCT DESIGNER
+                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">88 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">80 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">30 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                Junior UI Designer
+                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">10 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">10 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">6 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                UX Researcher
+                                                <div class="text-xs text-gray-500">TOTAL APPLICATION 88</div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">90 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">83 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">60 Candidates</span>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Jobs Summary & Employee Section -->
+                        <div class="md:col-span-1 flex flex-col space-y-6">
+                            <!-- Jobs Summary -->
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-gray-800">Jobs Summary</h3>
+                                    <button class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                    </button>
+                                </div>
+                                <div class="flex flex-col items-center justify-center">
+                                    <div class="relative w-32 h-32 mb-4">
+                                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                                            <circle class="text-gray-200 stroke-current" stroke-width="10" cx="50" cy="50" r="40" fill="transparent"></circle>
+                                            <circle class="progress-ring__circle text-purple-500 stroke-current" stroke-width="10" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="62.8"></circle> <!-- 25% filled -->
+                                        </svg>
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span class="text-3xl font-bold text-gray-800">133</span>
+                                            <span class="text-sm text-gray-500">TOTAL JOBS</span>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-sm text-gray-700 w-full">
+                                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>80 PUBLISHED</div>
+                                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-yellow-400 mr-2"></span>20 ON HOLD</div>
+                                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>18 INTERNAL</div>
+                                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>15 CLOSED</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Employee Section -->
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-gray-800">Employee</h3>
+                                    <button class="text-blue-600 font-medium text-sm">VIEW ALL ></button>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">Design Team</span>
+                                            <span class="text-sm text-gray-500">TOTAL MEMBER 28</span>
+                                        </div>
+                                        <div class="flex -space-x-2 overflow-hidden">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=A" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=B" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=C" alt="Avatar">
+                                            <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+24</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">Development Team</span>
+                                            <span class="text-sm text-gray-500">TOTAL MEMBER 16</span>
+                                        </div>
+                                        <div class="flex -space-x-2 overflow-hidden">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=D" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=E" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=F" alt="Avatar">
+                                            <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+13</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">Finance Team</span>
+                                            <span class="text-sm text-gray-500">TOTAL MEMBER 10</span>
+                                        </div>
+                                        <div class="flex -space-x-2 overflow-hidden">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=G" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=H" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=I" alt="Avatar">
+                                            <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+7</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-gray-900">Sales Team</span>
+                                            <span class="text-sm text-gray-500">TOTAL MEMBER 30</span>
+                                        </div>
+                                        <div class="flex -space-x-2 overflow-hidden">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/FF6347/FFFFFF?text=J" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/32CD32/FFFFFF?text=K" alt="Avatar">
+                                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://placehold.co/32x32/4682B4/FFFFFF?text=L" alt="Avatar">
+                                            <span class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+27</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Task Section -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">My Task</h3>
+                            <div class="flex items-center space-x-2">
+                                <div class="relative">
+                                    <select class="block appearance-none bg-white border border-gray-300 px-3 py-1 rounded-lg text-sm text-gray-700">
+                                        <option>Today</option>
+                                        <option>This Week</option>
+                                        <option>This Month</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <input type="text" value="Feb 18 - Nov 18" class="pl-3 pr-8 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-700">
+                                    <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <button class="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg shadow-md text-sm">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                                    ADD TASK
+                                </button>
+                            </div>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">09:00 - 10:00 AM</div>
+                                        <div class="text-gray-600">Interview with candidates from product designer application</div>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                </button>
+                            </li>
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">10:30 - 12:00 AM</div>
+                                        <div class="text-gray-600">UI Design candidate screening</div>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                </button>
+                            </li>
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">13:30 - 14:00 PM</div>
+                                        <div class="text-gray-600">Submit freelance recruitment result</div>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                </button>
+                            </li>
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">14:00 - 15:00 PM</div>
+                                        <div class="text-gray-600">Make new career vacancy</div>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                </button>
+                            </li>
+                            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded-full">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-800">16:30 - 18:00 PM</div>
+                                        <div class="text-gray-600">Conduct test for UX Researcher candidates</div>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Technical Dashboard -->
+                <section id="technical-dashboard-content" class="hidden">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Technical Dashboard</h1>
+                    <p class="text-gray-500 mb-6">Welcome, Technical User! Here are your key tasks and resources.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Assigned Projects</h3>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Develop new API endpoint for user authentication</li>
+                                <li>Fix bug in payment gateway integration</li>
+                                <li>Code review for "Feature X" branch</li>
+                                <li>Research new database technologies</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Technical Resources</h3>
+                            <ul class="list-disc list-inside text-blue-600 space-y-2">
+                                <li><a href="#" class="hover:underline">API Documentation</a></li>
+                                <li><a href="#" class="hover:underline">Codebase Guidelines</a></li>
+                                <li><a href="#" class="hover:underline">Internal Wiki</a></li>
+                                <li><a href="#" class="hover:underline">Stack Overflow (Internal)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Commits</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <span class="text-green-600 mr-3">✓</span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-800">feat: Add user profile update functionality</div>
+                                    <div class="text-sm text-gray-600">by John Doe - 2 hours ago</div>
+                                </div>
+                            </li>
+                            <li class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <span class="text-green-600 mr-3">✓</span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-800">fix: Resolve critical bug in login flow</div>
+                                    <div class="text-sm text-gray-600">by Jane Smith - yesterday</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Admin Dashboard -->
+                <section id="admin-dashboard-content" class="hidden">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+                    <p class="text-gray-500 mb-6">Manage users, settings, and monitor system health.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">User Management</h3>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Total Users: <span class="font-semibold">250</span></li>
+                                <li>Active Users: <span class="font-semibold">210</span></li>
+                                <li>Pending Approvals: <span class="font-semibold text-orange-500">5</span></li>
+                            </ul>
+                            <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow-md text-sm">Manage Users</button>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">System Health</h3>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Server Status: <span class="font-semibold text-green-600">Operational</span></li>
+                                <li>Database Load: <span class="font-semibold">25%</span></li>
+                                <li>Last Backup: <span class="font-semibold">2025-07-28 02:00 AM</span></li>
+                            </ul>
+                            <button class="mt-4 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg shadow-md text-sm">View Logs</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Admin Actions</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <span class="text-blue-600 mr-3">⚙️</span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-800">Changed global notification settings</div>
+                                    <div class="text-sm text-gray-600">by Admin User - 1 hour ago</div>
+                                </div>
+                            </li>
+                            <li class="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <span class="text-blue-600 mr-3">⚙️</span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-800">Approved new user registration: Alice Johnson</div>
+                                    <div class="text-sm text-gray-600">by Admin User - 3 hours ago</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('login-error');
+        const logoutButton = document.getElementById('logout-button');
+        const roleDropdown = document.getElementById('role-dropdown'); // Re-added dropdown
+
+        const recruiterDashboardContent = document.getElementById('recruiter-dashboard-content');
+        const technicalDashboardContent = document.getElementById('technical-dashboard-content');
+        const adminDashboardContent = document.getElementById('admin-dashboard-content');
+
+        // Hardcoded user credentials for demonstration
+        const users = {
+            recruiter: { password: 'pass', role: 'recruiter' }, // Store role as lowercase for matching
+            technical: { password: 'pass', role: 'technical' },
+            admin: { password: 'pass', role: 'admin' }
+        };
+
+        // Function to hide all dashboard content sections
+        function hideAllDashboards() {
+            recruiterDashboardContent.classList.add('hidden');
+            technicalDashboardContent.classList.add('hidden');
+            adminDashboardContent.classList.add('hidden');
+        }
+
+        // Function to show a specific dashboard based on role
+        function showDashboard(role) {
+            hideAllDashboards(); // Hide all dashboards first
+
+            switch (role) {
+                case 'recruiter':
+                    recruiterDashboardContent.classList.remove('hidden');
+                    break;
+                case 'technical':
+                    technicalDashboardContent.classList.remove('hidden');
+                    break;
+                case 'admin':
+                    adminDashboardContent.classList.remove('hidden');
+                    break;
+                default:
+                    console.error("Unknown role:", role);
+                    break;
+            }
+            // Set the dropdown value to reflect the currently active dashboard
+            roleDropdown.value = role;
+        }
+
+        // Function to populate the role dropdown
+        function populateRoleDropdown(initialRole) {
+            // Clear existing options
+            roleDropdown.innerHTML = '';
+
+            // Define all possible roles to be displayed in the dropdown
+            const roles = [
+                { value: 'recruiter', text: 'Recruiter Dashboard' },
+                { value: 'technical', text: 'Technical Dashboard' },
+                { value: 'admin', text: 'Admin Dashboard' }
+            ];
+
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.value;
+                option.textContent = role.text;
+                roleDropdown.appendChild(option);
+            });
+
+            // Set the dropdown to the initial role after login
+            roleDropdown.value = initialRole;
+        }
+
+        // Function to show the login screen and hide the dashboard
+        function showLoginScreen() {
+            loginScreen.classList.remove('hidden');
+            dashboardContainer.classList.add('hidden');
+            loginForm.reset(); // Clear the form fields
+            loginError.classList.add('hidden'); // Hide any previous error messages
+            // No need to reset dropdown here, as it will be populated on next login
+        }
+
+        // Function to show the dashboard and hide the login screen
+        function showMainDashboard() {
+            loginScreen.classList.add('hidden');
+            dashboardContainer.classList.remove('hidden');
+        }
+
+        // Event Listener for login form submission
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const username = usernameInput.value.trim().toLowerCase();
+            const password = passwordInput.value.trim();
+
+            if (users[username] && users[username].password === password) {
+                // Successful login
+                showMainDashboard();
+                const userRole = users[username].role;
+                populateRoleDropdown(userRole); // Populate and set dropdown to logged-in user's role
+                showDashboard(userRole); // Show the dashboard corresponding to the logged-in user
+            } else {
+                // Failed login
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Event Listener for role dropdown change
+        roleDropdown.addEventListener('change', (event) => {
+            const selectedRole = event.target.value;
+            showDashboard(selectedRole);
+        });
+
+        // Event Listener for logout button
+        logoutButton.addEventListener('click', showLoginScreen);
+
+        // Initialize: Show the login screen on page load
+        document.addEventListener('DOMContentLoaded', showLoginScreen);
+
+        // Example for the Jobs Summary progress ring (static value for demonstration)
+        // This will only apply to the recruiter dashboard's Jobs Summary.
+        const totalJobs = 133;
+        const publishedJobs = 80;
+        const percentagePublished = (publishedJobs / totalJobs) * 100;
+
+        const radius = 40;
+        const circumference = 2 * Math.PI * radius;
+
+        const progressCircle = document.querySelector('.progress-ring__circle');
+        if (progressCircle) {
+            progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+            // Visually similar to the image's 25% fill for the purple segment.
+            progressCircle.style.strokeDashoffset = circumference - (25 / 100) * circumference;
+        }
+    </script>
+</body>
+</html>
